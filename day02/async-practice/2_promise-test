@@ -1,0 +1,61 @@
+const DB = [];
+
+function saveDB(user) {
+    const oldDBsize = DB.length;
+    DB.push(user);
+    console.log(`${user.name} has saved to DB`);
+    
+    //promise 에는 3가지의 status 상태가 있다. -> 순서대로 수행
+    //1. 대기
+    //2. 실행
+    //3. 거절
+    return new Promise (
+        (resolve, reject) => {
+            if (DB.length > oldDBsize) {
+                resolve(user); //성공시 유저 정보 반환
+            } else {
+                reject(new Error("SAVING USER FAILED"));
+            }
+        }
+    );
+}
+
+
+function sendEmail(user) {
+    console.log(`${user.email} got an email`);
+    return new Promise(
+        (resolve) => {
+            resolve(user);
+        }
+    );
+}
+
+function getResult(user) {
+    console.log(`${user.name} got registerd`);
+    return new Promise(
+        (resolve, reject) => {
+            resolve(`sucess register ${user.name}`);
+        }
+    );
+}
+
+function register(user) {
+    const result = saveDB(user).then(sendEmail).then(getResult).catch(error => new Error(error));
+    console.log(result);
+    return result;
+}
+
+
+const myUser = {
+    email: "ssg@ssg.com",
+    password : "password",
+    name : "KIM"
+};
+
+// const result = register(myUser);
+result.then(console.log);
+
+//***순서대로 실행이 아니라, 한꺼번에 실행하고자 할 때!!!
+const allResult = Promise.all([saveDB(myUser), sendEmail(myUser), getResult(myUser)]);
+allResult.then(console.log);
+
